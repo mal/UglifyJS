@@ -14,6 +14,7 @@ var uglify = require("../uglify-js"),
 // variables
 
 var args = jsp.slice(process.argv, 2),
+    comment = /^\/[\/\*]/,
     input = [],
     output = '-',
     options = {
@@ -187,7 +188,8 @@ function write(output, code) {
                      mode: 0644
                  });
     if (options.strict) {
-        var nl = options.beautify ? '\n\n' : /^\/[\/\*]/.test(code) ? '\n' : '';
+        // when neccessary write in global directive with correct spacing
+        var nl = options.beautify ? '\n\n' : comment.test(code) ? '\n' : '';
         stream.write('"use strict";' + nl);
     }
     stream.write(code.replace(/;*\s*$/, ''));
@@ -335,6 +337,19 @@ read(input, function(content) {
                 }
                 return item;
             });
+        }
+        if (!options.overwrite) {
+            // combine inputs that are not seperated by a leading comment for group squeezing
+            content = content.reduce(function(arr, item) {
+                var len = arr.length;
+                if (len && !comment.test(item[1].trim())) {
+                    arr[len-1][1] += '\n' + item[1];
+                } else {
+                    arr.push(item);
+                }
+                return arr;
+            }, []);
+            console.log(content);
         }
         content = content.map(function(item) {
             item[1] = squeeze(item[1]).trim();
