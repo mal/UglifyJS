@@ -52,6 +52,7 @@ var args = jsp.slice(process.argv, 2),
 function copyright(code) {
     var result = '';
     if (options.copyright) {
+        // get comments from first token of a new tokenizer
         var comments = jsp.tokenizer(code)().comments_before;
         for (var i = 0, l = comments.length; i < l; i++) {
             var comment = comments[i];
@@ -69,6 +70,7 @@ function copyright(code) {
 function read(input, callback) {
     var count = 0,
         content = [];
+    // kick off async reads for all inputs
     input.forEach(function(path, i) {
         var code = '',
             stream = path === '-'
@@ -82,6 +84,7 @@ function read(input, callback) {
         stream.on('end', function() {
             content[i] = [ path, code ];
             if ( ++count === input.length ) {
+                // all reads have completed
                 callback(content);
             }
         });
@@ -96,6 +99,7 @@ function squeeze(code) {
             return jsp.parse(code);
         });
         if (options.strict) {
+            // add directive to global scope for squeezing
             ast[1].unshift([ 'directive', 'use strict' ]);
         }
         if (options.consolidate) {
@@ -132,6 +136,9 @@ function squeeze(code) {
             });
         }
         if (options.strict) {
+            // remove the fake directive
+            // this prevents duplicate global directives when combining multiple files
+            // the global directive will be output only once; see output()
             ast[1].shift();
         }
         if (options.ast) {
