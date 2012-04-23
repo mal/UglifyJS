@@ -326,9 +326,9 @@ if (!input.length) {
 
 read(input, function(content) {
     if (options.copyright || options.make || options.overwrite) {
-        if (options.make) {
+        if (options.make && specification) {
             content = content.map(function(item, i) {
-                var file = specification ? specification.files[i] : {};
+                var file = specification.files[i];
                 if (file.module) {
                     item[1] = "!function(exports, global){global = this;\n" + item[1] + "\n;this." + file.module + " = exports;}({})";
                 }
