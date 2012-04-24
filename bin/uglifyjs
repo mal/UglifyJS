@@ -72,7 +72,9 @@ function define(arg, module) {
     function parse(val) {
         var ast, leaf;
         try {
+            // use parser to decipher definitions
             ast = jsp.parse(val);
+            // first node in toplevel
             leaf = ast[1][0];
             switch (leaf[0]) {
                 case 'directive':
@@ -83,9 +85,11 @@ function define(arg, module) {
                     break;
             }
         } catch (err) {
-            leaf = [ 'block' ];
+            // failed to parse
         }
-        if (!jsp.member(leaf[0], ['name', 'num', 'regexp', 'string'])) {
+        // allow only literals for now, potential for dependency injection
+        if (!leaf || !jsp.member(leaf[0], ['name', 'num', 'regexp', 'string'])) {
+            // fallback to string when appropriate
             if (!module && !(/"/.test(val) && /'/.test(val))) {
                 return [ 'string', val ];
             }
@@ -104,6 +108,7 @@ function define(arg, module) {
             var mod = require(arg);
             for (sym in mod) {
                 if (mod.hasOwnProperty(sym)) {
+                    // use sys.inspect to make mod[sym] parsable
                     options.definitions[sym] = parse(sys.inspect(mod[sym]));
                 }
             }
