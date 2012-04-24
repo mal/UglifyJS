@@ -68,6 +68,62 @@ function copyright(code) {
     return result;
 }
 
+function define(arg, module) {
+    function parse(val) {
+        var ast, leaf;
+        try {
+            ast = jsp.parse(val);
+            leaf = ast[1][0];
+            switch (leaf[0]) {
+                case 'directive':
+                    leaf[0] = 'string';
+                    break;
+                case 'stat':
+                    leaf = leaf[1];
+                    break;
+            }
+        } catch (err) {
+            leaf = [ 'block' ];
+        }
+        if (!jsp.member(leaf[0], ['name', 'num', 'regexp', 'string'])) {
+            if (!module && !(/"/.test(val) && /'/.test(val))) {
+                return [ 'string', val ];
+            }
+            throw "Expecting a literal, encountered: " + val;
+        }
+        return leaf;
+    }
+    function symbol(sym) {
+        if (jsp.KEYWORDS_ATOM.hasOwnProperty(sym)) {
+            throw "Don't define values for inbuilt constant '" + sym + "'";
+        }
+        return sym;
+    }
+    try {
+        if (module) {
+            var mod = require(arg);
+            for (sym in mod) {
+                if (mod.hasOwnProperty(sym)) {
+                    options.definitions[sym] = parse(sys.inspect(mod[sym]));
+                }
+            }
+        } else {
+            if (arg.match(/^([a-z_\$][a-z_\$0-9]*)(?:=(.*))?$/i)) {
+                var sym = symbol(RegExp.$1),
+                    val = RegExp.$2 ? parse(RegExp.$2) : [ 'name', 'true' ];
+                options.definitions[sym] = val;
+            }
+            else {
+                throw "The --define option expects SYMBOL[=value]";
+            }
+        }
+    } catch (err) {
+        sys.print('ERROR: In option --define' + (module ? '-from-module' : '') + ' ' + arg + '\n');
+        sys.print('ERROR: ' + err + '\n');
+        process.exit(1);
+    }
+}
+
 function read(input, callback) {
     var count = 0,
         content = [];
@@ -219,10 +275,10 @@ while (args.length > 0) {
             break;
         case '-d':
         case '--define':
-            read_definitions(args, options.definitions);
+            define(args.shift());
             break;
         case '--define-from-module':
-            read_module_definitions(args, options.definitions);
+            define(args.shift(), true);
             break;
         case '-i':
         case '--indent':
@@ -349,7 +405,6 @@ read(input, function(content) {
                 }
                 return arr;
             }, []);
-            console.log(content);
         }
         content = content.map(function(item) {
             item[1] = squeeze(item[1]).trim();
