@@ -170,19 +170,20 @@ There is a command-line tool that exposes the functionality of this library
 for your shell-scripting needs:
 
 #+BEGIN_SRC sh
-uglifyjs [ options... ] [ filename ]
+uglifyjs [ options... ] [ filenames... ]
 #+END_SRC
 
-=filename= should be the last argument and should name the file from which
-to read the JavaScript code.  If you don't specify it, it will read code
-from STDIN.
+=filenames= should come after all options and should name the files from
+which to read the JavaScript code.  If you don't specify it, it will read
+code from STDIN.
 
 Supported options:
 
 - =-b= or =--beautify= --- output indented code; when passed, additional
   options control the beautifier:
 
-  - =-i N= or =--indent N= --- indentation level (number of spaces)
+  - =-i N[,M]= or =--indent N[,M]= --- indentation level (number of spaces)
+    and an optional second value for the starting level
 
   - =-q= or =--quote-keys= --- quote keys in literal objects (by default,
     only keys that cannot be identifier names will be quotes).
@@ -230,6 +231,10 @@ Supported options:
 - =--overwrite= --- if the code is read from a file (not from STDIN) and you
   pass =--overwrite= then the output will be written in the same file.
 
+- =-s= or =--strict= --- adds a global =​"use strict";= directive, allowing
+  it to be factored out of the code.  Ensure your code is strict mode compatible
+  before using this option.
+
 - =--ast= --- pass this if you want to get the Abstract Syntax Tree instead
   of JavaScript as output.  Useful for debugging or learning more about the
   internals.
@@ -244,9 +249,9 @@ Supported options:
   argument may be specified multiple times to define multiple
   symbols - if no value is specified the symbol will be replaced with
   the value =true=, or you can specify a numeric value (such as
-  =1024=), a quoted string value (such as ="object"= or
-  ='https://github.com'=), or the name of another symbol or keyword
-  (such as =null= or =document=).
+  =1024=), a quoted string value (such as =​"object"​= or
+  =​'https://github.com'​=), a regular expression (such as =/[a-z0-9]/g=),
+  or the name of another symbol or keyword (such as =null= or =document=).
   This allows you, for example, to assign meaningful names to key
   constant values but discard the symbolic names in the uglified
   version for brevity/efficiency, or when used wth care, allows

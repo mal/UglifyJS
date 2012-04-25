@@ -381,14 +381,14 @@ for your shell-scripting needs:
 
 
 
-<pre class="src src-sh">uglifyjs [ options... ] [ filename ]
+<pre class="src src-sh">uglifyjs [ options... ] [ filenames... ]
 </pre>
 
 
 <p>
-<code>filename</code> should be the last argument and should name the file from which
-to read the JavaScript code.  If you don't specify it, it will read code
-from STDIN.
+<code>filenames</code> should come after all options and should name the files from
+which to read the JavaScript code.  If you don't specify it, it will read
+code from STDIN.
 </p>
 <p>
 Supported options:
@@ -398,7 +398,8 @@ Supported options:
   options control the beautifier:
 
 <ul>
-<li><code>-i N</code> or <code>--indent N</code> &mdash; indentation level (number of spaces)
+<li><code>-i N[,M]</code> or <code>--indent N[,M]</code> &mdash; indentation level (number of spaces)
+  and an optional second value for the starting level
 
 </li>
 <li><code>-q</code> or <code>--quote-keys</code> &mdash; quote keys in literal objects (by default,
@@ -457,6 +458,11 @@ Supported options:
   pass <code>--overwrite</code> then the output will be written in the same file.
 
 </li>
+<li><code>-s</code> or <code>--strict</code> &mdash; adds a global <code>&#8203;"use strict";= directive, allowing
+  it to be factored out of the code.  Ensure your code is strict mode compatible
+  before using this option.
+
+</li>
 <li><code>--ast</code> &mdash; pass this if you want to get the Abstract Syntax Tree instead
   of JavaScript as output.  Useful for debugging or learning more about the
   internals.
@@ -473,8 +479,9 @@ Supported options:
   argument may be specified multiple times to define multiple
   symbols - if no value is specified the symbol will be replaced with
   the value <code>true</code>, or you can specify a numeric value (such as
-  <code>1024</code>), a quoted string value (such as ="object"= or
-  ='https://github.com'<code>), or the name of another symbol or keyword   (such as =null</code> or <code>document</code>).
+  <code>1024</code>), a quoted string value (such as <code>&#8203;"object"&#8203;</code> or
+  <code>&#8203;'https://github.com'&#8203;</code>), a regular expression (such as <code>/[a-z0-9]/g</code>),
+  or the name of another symbol or keyword (such as <code>null</code> or <code>document</code>).
   This allows you, for example, to assign meaningful names to key
   constant values but discard the symbolic names in the uglified
   version for brevity/efficiency, or when used wth care, allows
