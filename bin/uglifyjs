@@ -53,6 +53,8 @@ var args = jsp.slice(process.argv, 2),
 function copyright(code) {
     var result = '';
     if (options.copyright) {
+        // clear any directives hoisted by a previous run
+        code = code.replace(/^"[^"\n]+";\n/, '');
         // get comments from first token of a new tokenizer
         var comments = jsp.tokenizer(code)().comments_before;
         for (var i = 0, l = comments.length; i < l; i++) {
