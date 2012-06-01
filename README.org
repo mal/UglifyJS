@@ -244,8 +244,8 @@ Supported options:
   argument may be specified multiple times to define multiple
   symbols - if no value is specified the symbol will be replaced with
   the value =true=, or you can specify a numeric value (such as
-  =1024=), a quoted string value (such as ="object"= or
-  ='https://github.com'=), or the name of another symbol or keyword
+  =1024=), a quoted string value (such as =​"object"​= or
+  =​'https://github.com'​=), or the name of another symbol or keyword
   (such as =null= or =document=).
   This allows you, for example, to assign meaningful names to key
   constant values but discard the symbolic names in the uglified
